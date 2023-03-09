@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easterfg.takeaway.dao.DishDAO">
+    <resultMap id="dishMap" type="dish" autoMapping="true">
+        <id column="id" property="id"/>
+        <collection property="flavors" ofType="dishFlavor">
+            <id column="df_id" property="id"/>
+            <result column="df_name" property="name"/>
+            <result column="value" property="value"/>
+        </collection>
+    </resultMap>
+
+    <select id="listDish" resultType="Dish">
+        SELECT id,
+               name,
+               category_id,
+               price,
+               image,
+               description,
+               status,
+               sort,
+               update_time
+        FROM dish
+        where is_deleted = 0
+    </select>
+
+    <select id="listDishByCid" resultMap="dishMap">
+        SELECT d.id,
+        d.name,
+        price,
+        image,
+        description,
+        df.id AS df_id,
+        df.name AS df_name,
+        df.value
+        FROM dish d
+        LEFT JOIN dish_flavor df on d.id = df.dish_id
+        <where>
+            <if test="_parameter != null">
+                category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
+
+    <!--  修改逻辑删除字段  -->
+    <update id="deleteByIds">
+        update dish
+        set is_deleted = 1
+        where status = 0
+        and id in
+        <foreach collection="collection" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="updateDish">
+        update dish
+        <set>
+            <if test="name != null and name != ''">
+                `name` = #{name},
+            </if>
+            <if test="categoryId != null">
+                category_id = #{categoryId},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="image != null and image != ''">
+                image = #{image},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="status != null">
+                `status` = #{status},
+            </if>
+            <if test="sort != null">
+                sort = #{sort},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+        </set>
+        where id = #{id}
+        and is_deleted = 0
+    </update>
+</mapper>

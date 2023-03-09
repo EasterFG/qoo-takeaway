@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easterfg.takeaway.dao.CategoryDAO">
+    <select id="listCategory" resultType="com.easterfg.takeaway.domain.Category">
+        SELECT id, type, name, sort, status, update_time
+        FROM category WHERE is_deleted = 0
+        <if test="name != null and name != ''">
+            and name like concat('%', #{name}, '%')
+        </if>
+        <if test="type != null">
+            and type = #{type}
+        </if>
+        ORDER BY sort
+    </select>
+
+    <select id="listCategoryByType" resultType="com.easterfg.takeaway.domain.Category">
+        SELECT id, name, type
+        FROM category
+        WHERE is_deleted = 0
+        and status = 1
+        <if test="type != null">
+            and type = #{type}
+        </if>
+        ORDER BY sort
+    </select>
+
+    <update id="updateCategory">
+        update category
+        <set>
+            <if test="type != null">
+                `type` = #{type},
+            </if>
+            <if test="name != null and name != ''">
+                `name` = #{name},
+            </if>
+            <if test="sort != null">
+                sort = #{sort},
+            </if>
+            <if test="status != null">
+                `status` = #{status},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            update_user = #{updateUser}
+        </set>
+        where id = #{id}
+        and is_deleted = 0;
+    </update>
+</mapper>

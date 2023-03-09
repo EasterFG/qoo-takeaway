@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easterfg.takeaway.dao.EmployeeDAO">
+    <select id="listEmployee" resultType="com.easterfg.takeaway.domain.Employee">
+        select id,
+        username,
+        name,
+        password,
+        phone,
+        gender,
+        id_card,
+        status,
+        update_time
+        from employee
+        where is_deleted = 0
+        <if test="name != null and name != ''">
+            and name like concat('%', #{name}, '%')
+        </if>
+    </select>
+</mapper>

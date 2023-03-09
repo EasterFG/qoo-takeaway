@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easterfg.takeaway.dao.DishFlavorDAO">
+    <delete id="deleteNoIn">
+        delete
+        from dish_flavor where
+        <if test="ids != null and ids.size() != 0">
+            id not in
+            <foreach collection="ids" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            and
+        </if>
+        dish_id = #{dishId}
+    </delete>
+
+    <update id="updateDishFlavor">
+        update dish_flavor set value = #{value}
+        , update_time = now()
+        , update_user = #{updateUser}
+        <if test="name != null and name != ''">
+            , name = #{name}
+        </if>
+        where id = #{id};
+    </update>
+</mapper>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easterfg.takeaway.dao.ComboDishDAO">
+    <delete id="deleteNoId">
+        delete
+        from combo_dish
+        where combo_id = #{comboId}
+        <if test="ids != null and ids.size() != 0">
+            and id in
+            <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </delete>
+
+    <update id="updateComboDish">
+        update combo_dish
+        set update_user = #{updateUser},
+        <if test="dishId != null">
+            dish_id = #{dishId,jdbcType=BIGINT},
+        </if>
+        <if test="name != null">
+            `name` = #{name,jdbcType=VARCHAR},
+        </if>
+        <if test="price != null">
+            price = #{price,jdbcType=DECIMAL},
+        </if>
+        <if test="copies != null">
+            copies = #{copies,jdbcType=INTEGER},
+        </if>
+        <if test="sort != null">
+            sort = #{sort,jdbcType=INTEGER}
+        </if>
+        where id = #{id}
+    </update>
+</mapper>

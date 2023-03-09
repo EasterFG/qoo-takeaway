@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easterfg.takeaway.dao.StatisticsDAO">
+    <select id="listStatistics" resultType="com.easterfg.takeaway.domain.Statistics">
+        select turnover, total_order, complete_order, cancel_order, user_count, create_time
+        from statistics
+        where
+        <if test="start == null and end != null">
+            create_time = #{end};
+        </if>
+        <if test="start != null and end != null">
+            create_time between #{start} and #{end};
+        </if>
+    </select>
+</mapper>
