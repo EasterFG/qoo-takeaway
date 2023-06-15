@@ -101,7 +101,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Result noPermissionException(AccessDeniedException exception) {
-        return Result.failed("40006", exception.getMessage());
+        return Result.failed("40009", exception.getMessage());
     }
 
     /**

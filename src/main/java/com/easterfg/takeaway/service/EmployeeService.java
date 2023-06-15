@@ -1,9 +1,7 @@
 package com.easterfg.takeaway.service;
 
 import com.easterfg.takeaway.domain.Employee;
-import com.easterfg.takeaway.dto.EmployeeLoginDTO;
-import com.easterfg.takeaway.dto.PageData;
-import com.easterfg.takeaway.dto.Result;
+import com.easterfg.takeaway.dto.*;
 import com.easterfg.takeaway.query.PageQuery;
 
 /**
@@ -26,6 +24,10 @@ public interface EmployeeService {
      */
     Result logout();
 
+    EmployeeInfoDTO me();
+
+    Result updatePassword(ChangePasswordDTO changePasswordDTO);
+
     PageData<Employee> listEmployee(PageQuery pageQuery, String name);
 
     Employee getEmployee(Long id);
@@ -35,4 +37,6 @@ public interface EmployeeService {
     void saveEmployee(Employee employee);
 
     boolean deleteEmployee(Long id);
+
+    Result resetPassword();
 }

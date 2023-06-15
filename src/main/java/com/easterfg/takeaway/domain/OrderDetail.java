@@ -27,7 +27,7 @@ public class OrderDetail {
      * 订单ID
      */
     @ApiModelProperty(value = "订单ID")
-    private Long orderId;
+    private Long tradeNo;
 
     /**
      * 菜品ID

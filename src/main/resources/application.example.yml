@@ -5,25 +5,21 @@ spring:
     name: qoo-takeaway
   datasource:
     druid:
+      # 数据库
       url: jdbc:mysql://localhost:3306/takeout
+      # 用户名
       username: root
-      password: 123456
+      # 密码
+      password: root
       driver-class-name: com.mysql.cj.jdbc.Driver
       initial-size: 5
       filters: stat,wall
-  #      stat-view-servlet:
-  #        enabled: true
-  #        url-pattern: /druid/*
-  #        reset-enable: false
-  #        login-username: druid
-  #        login-password: druid
-  #        allow: 127.0.0.1
-  #      web-stat-filter:
-  #        enabled: true
-  #        url-pattern: /*
-  #        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
 
   redis:
+    # redis 地址
+    host: 127.0.0.1
+    # 端口
+    port: 6379
     timeout: 600
     lettuce:
       pool:
@@ -57,25 +53,27 @@ springfox:
 
 upload:
   # 文件上传路径
-  path: 请填写文件上传路径
+  path: /usr/takeaway/upload
 
 jwt:
-  # 密钥
-  secret: 填写jwt密钥
+  # 密钥, 只能填写英文和数字
+  secret: keys
   header: authorization
   expire: 288000
 # 支付宝支付配置
 alipay:
   # appID
-  app-id: 填写appid
+  app-id:
   # 支付网关地址
-  server-url: https://openapi.alipaydev.com/gateway.do
+  server-url:
   # 异步通知网址
-  notify: 填写异步通知地址
-  # 公钥
-  public-key: 填写公钥
+  notify:
+  # 公钥位置
+  public-key: app_public_key.pem
+  # 私钥位置
+  private-key: app_private_key.pem
   charset: UTF-8
   sign-type: RSA2
-  private-key: 填写私钥路径
+
 # debug模式
-#debug: true
+debug: true

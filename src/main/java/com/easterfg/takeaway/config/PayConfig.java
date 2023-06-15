@@ -46,7 +46,7 @@ public class PayConfig {
         config.setSignType(signType);
         config.setCharset(charset);
         config.setFormat("json");
-        config.setAlipayPublicKey(publicKey);
+        config.setAlipayPublicKey(FileUtils.readFileToString(new File(publicKey)));
         // 为避免私钥随源码泄露，推荐从文件中读取私钥字符串而不是写入源码中
         config.setPrivateKey(FileUtils.readFileToString(new File(privateKey)));
         return config;

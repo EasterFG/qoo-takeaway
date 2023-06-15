@@ -14,16 +14,27 @@
 
     <select id="listDish" resultType="Dish">
         SELECT id,
-               name,
-               category_id,
-               price,
-               image,
-               description,
-               status,
-               sort,
-               update_time
+        name,
+        category_id,
+        price,
+        image,
+        description,
+        status,
+        sort,
+        update_time
         FROM dish
-        where is_deleted = 0
+        <where>
+            is_deleted = 0
+            <if test="name != null and name != ''">
+                and name like CONCAT('%', #{name}, '%')
+            </if>
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
     </select>
 
     <select id="listDishByCid" resultMap="dishMap">

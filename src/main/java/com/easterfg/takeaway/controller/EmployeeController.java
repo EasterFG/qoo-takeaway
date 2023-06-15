@@ -1,6 +1,7 @@
 package com.easterfg.takeaway.controller;
 
 import com.easterfg.takeaway.domain.Employee;
+import com.easterfg.takeaway.dto.ChangePasswordDTO;
 import com.easterfg.takeaway.dto.EmployeeLoginDTO;
 import com.easterfg.takeaway.dto.Result;
 import com.easterfg.takeaway.query.PageQuery;
@@ -37,10 +38,36 @@ public class EmployeeController {
     @ApiOperation("员工登录接口")
     @PostMapping("/login")
     public Result login(@Validated @RequestBody EmployeeLoginDTO employeeLoginDto) {
-        String token = employeeService.login(employeeLoginDto);
-        return Result.success("success", token);
+        return Result.success("success", employeeService.login(employeeLoginDto));
     }
 
+    @Authorize(Role.EMPLOYEE)
+    @GetMapping("/me")
+    public Result me() {
+        return Result.success("success", employeeService.me());
+    }
+
+    /**
+     * 退出登录
+     */
+    @Authorize(Role.EMPLOYEE)
+    @DeleteMapping("/logout")
+    public Result logout() {
+        //TODO 将token缓存到redis黑名单中
+        return Result.success();
+    }
+
+    @Authorize(Role.EMPLOYEE)
+    @PutMapping("/password")
+    public Result updatePassword(@RequestBody @Validated(UpdateOperate.class) ChangePasswordDTO changePasswordDTO) {
+        return employeeService.updatePassword(changePasswordDTO);
+    }
+
+    @Authorize(Role.ADMIN)
+    @PutMapping("/password/reset/{id}")
+    public Result resetPassword(@PathVariable Long id) {
+        return employeeService.resetPassword();
+    }
 
     /**
      * 查询所有员工

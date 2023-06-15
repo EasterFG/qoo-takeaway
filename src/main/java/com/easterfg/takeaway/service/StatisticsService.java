@@ -3,6 +3,7 @@ package com.easterfg.takeaway.service;
 
 import com.easterfg.takeaway.domain.Statistics;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -16,4 +17,6 @@ public interface StatisticsService {
     void autoStatistics();
 
     List<Statistics> getStatistics(int flag);
+
+    List<Statistics> statistics(LocalDate start, LocalDate end);
 }

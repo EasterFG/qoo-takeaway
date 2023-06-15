@@ -57,12 +57,13 @@ public class ComboServiceImpl implements ComboService {
         return new PageData<>(info);
     }
 
-    @Cacheable(value = "combo", key = "#categoryId")
+    @Cacheable(value = "combos", key = "#categoryId")
     @Override
     public List<Combo> listCombo(Long categoryId) {
         return comboDAO.listComboByCid(categoryId);
     }
 
+    @Cacheable(value = "combo", key = "#id")
     @Override
     public Combo getCombo(Long id) {
         Combo combo = comboDAO.getCombo(id);

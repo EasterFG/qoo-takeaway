@@ -1,25 +1,29 @@
 package com.easterfg.takeaway.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.easterfg.takeaway.utils.enums.OrderStatus;
+import com.easterfg.takeaway.utils.enums.PayStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Data
-@TableName("takeout_order")
+@ToString
 public class Order {
+
     /**
-     * 自增主键
+     * 订单编号, 全局唯一
      */
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @ApiModelProperty(value = "自增主键")
-    @TableId(type = IdType.AUTO)
-    private Long id;
+    @ApiModelProperty(value = "订单编号")
+    private Long tradeNo;
+
 
     /**
      * 下单用户ID
@@ -28,11 +32,6 @@ public class Order {
     @ApiModelProperty(value = "下单用户ID")
     private Long userId;
 
-    /**
-     * 订单编号
-     */
-    @ApiModelProperty(value = "订单编号")
-    private Long tradeNo;
 
     /**
      * 交易流水号
@@ -42,23 +41,25 @@ public class Order {
     private String outTradeNo;
 
     /**
-     * 订单状态 1.待付款 2.待派送 3.已派送 4.已完成 5.已取消
+     * 订单状态 0.待付款 1.待接单 2.待派送 3.派送中 4.已完成 5.已取消
+     */
+    @JsonSerialize()
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @ApiModelProperty(value = "订单状态 0.待付款 1.待接单 2.待派送 3.派送中 4.已完成 5.已取消")
+    private OrderStatus status;
+
+    /**
+     * 支付状态 0:未支付 1: 已支付 2: 已退款
      */
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @ApiModelProperty(value = "订单状态 1.待付款 2.待接单 3.待派送 4.派送中 5.已完成 6.已取消")
-    private Integer status;
+    @ApiModelProperty(value = "支付状态 0:未支付 1: 已支付 2: 已退款")
+    private PayStatus payStatus;
 
     /**
      * 支付渠道 1.微信 2.支付宝
      */
     @ApiModelProperty(value = "支付渠道 1.微信 2.支付宝")
     private Integer payMethod;
-
-    /**
-     * 支付状态 0:未支付 1: 已支付 2: 已退款
-     */
-    @ApiModelProperty(value = "支付状态 0:未支付 1: 已支付 2: 已退款")
-    private Integer payStatus;
 
     /**
      * 订单总金额

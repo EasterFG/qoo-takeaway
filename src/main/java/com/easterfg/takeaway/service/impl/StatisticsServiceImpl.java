@@ -3,8 +3,8 @@ package com.easterfg.takeaway.service.impl;
 import com.easterfg.takeaway.dao.OrderDAO;
 import com.easterfg.takeaway.dao.StatisticsDAO;
 import com.easterfg.takeaway.dao.UserDAO;
-import com.easterfg.takeaway.domain.OrderStatusStatistics;
 import com.easterfg.takeaway.domain.Statistics;
+import com.easterfg.takeaway.domain.StatusStatistics;
 import com.easterfg.takeaway.exception.BusinessException;
 import com.easterfg.takeaway.service.StatisticsService;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.ValueRange;
 import java.util.List;
 
@@ -36,15 +37,27 @@ public class StatisticsServiceImpl implements StatisticsService {
     public void autoStatistics() {
         // 每天凌晨统计上一日数据
         // 获取当前时间的前一, 确保时间一定是当天的00:00
-        LocalDateTime time = LocalDateTime.from(LocalDate.now().minusDays(1));
-        OrderStatusStatistics os = orderDAO.statisticsByDate(time);
+        LocalDate minusDays = LocalDate.now().minusDays(1);
+        LocalDateTime time = LocalDateTime.of(minusDays.getYear(), minusDays.getMonth(), minusDays.getDayOfMonth(),
+                0, 0);
+        List<StatusStatistics> lists = orderDAO.statisticsByDate(time);
         BigDecimal decimal = orderDAO.statisticsAmount(time);
         int userAmount = userDAO.countUserByDate(time);
+        int total = 0;
         Statistics statistics = new Statistics();
+        for (StatusStatistics status : lists) {
+            total += status.getCount();
+            switch (status.getStatus()) {
+                case FINISHED:
+                    statistics.setCompleteOrder(status.getCount());
+                    break;
+                case CANCELLED:
+                    statistics.setCancelOrder(status.getCount());
+                    break;
+            }
+        }
+        statistics.setTotalOrder(total);
         statistics.setTurnover(decimal);
-        statistics.setTotalOrder(os.getTotal());
-        statistics.setCancelOrder(os.getCancel());
-        statistics.setCompleteOrder(os.getComplete());
         statistics.setCreateTime(time.toLocalDate());
         statistics.setUserCount(userAmount);
         statisticsDAO.insertStatistics(statistics);
@@ -77,6 +90,14 @@ public class StatisticsServiceImpl implements StatisticsService {
                 break;
             default:
                 throw new BusinessException("用户参数错误");
+        }
+        return statisticsDAO.listStatistics(start, end);
+    }
+
+    @Override
+    public List<Statistics> statistics(LocalDate start, LocalDate end) {
+        if (ChronoUnit.DAYS.between(start, end) > 30) {
+            throw new BusinessException("时间查超过30天");
         }
         return statisticsDAO.listStatistics(start, end);
     }

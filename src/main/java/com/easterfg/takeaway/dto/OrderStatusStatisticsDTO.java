@@ -1,14 +1,12 @@
-package com.easterfg.takeaway.domain;
+package com.easterfg.takeaway.dto;
 
 import lombok.Data;
 
 /**
- * @author EasterFG on 2022/11/15
- * <p>
- * 订单状态统计, 待处理, 待配送, 配送中
+ * @author EasterFG on 2023/6/12
  */
 @Data
-public class OrderStatusStatistics {
+public class OrderStatusStatisticsDTO {
 
     /**
      * 总数

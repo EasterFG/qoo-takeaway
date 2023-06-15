@@ -12,6 +12,8 @@ import com.easterfg.takeaway.dto.Result;
 import com.easterfg.takeaway.service.OrderService;
 import com.easterfg.takeaway.service.PayService;
 import com.easterfg.takeaway.utils.constant.GlobalConstant;
+import com.easterfg.takeaway.utils.enums.OrderStatus;
+import com.easterfg.takeaway.utils.enums.PayStatus;
 import com.easterfg.takeaway.utils.security.Authorize;
 import com.easterfg.takeaway.utils.security.Role;
 import io.swagger.annotations.Api;
@@ -77,7 +79,7 @@ public class PayController {
                 .eq(Order::getTradeNo, id);
         Order order = orderService.getOne(wrapper);
         // 查询订单状态
-        if (order.getStatus() == 1) {
+        if (order.getStatus() == OrderStatus.WAIT_PAYMENT) {
             // 调用三方服务查询
             PayQueryDTO payQuery = payService.queryOrder(id);
             if (payQuery != null && payQuery.getTradeStatus().equals(PayQueryDTO.Status.TRADE_SUCCESS)) {
@@ -91,9 +93,9 @@ public class PayController {
                 orderService.update(update);
                 return Result.failed("A2001", "订单已经支付");
             }
-        } else if (order.getPayStatus() == 1) {
+        } else if (order.getPayStatus() == PayStatus.PAID) {
             return Result.failed("A2001", "订单已经支付");
-        } else if (order.getStatus() != 1) {
+        } else if (order.getStatus() != OrderStatus.WAIT_PAYMENT) {
             return Result.failed("A2002", "订单已经完成或已取消");
         }
         LocalDateTime timeout = order.getCreateTime().plusMinutes(15);

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -24,6 +25,12 @@ public class StatisticsController {
     @GetMapping("{flag}")
     public Result getStatistics(@PathVariable("flag") Integer flag) {
         List<Statistics> statistics = statisticsService.getStatistics(flag);
+        return Result.success(statistics);
+    }
+
+    @GetMapping
+    public Result statistics(LocalDate start, LocalDate end) {
+        List<Statistics> statistics = statisticsService.statistics(start, end);
         return Result.success(statistics);
     }
 }

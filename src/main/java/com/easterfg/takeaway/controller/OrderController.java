@@ -7,7 +7,7 @@ import com.easterfg.takeaway.dto.RefundDTO;
 import com.easterfg.takeaway.dto.Result;
 import com.easterfg.takeaway.query.PageQuery;
 import com.easterfg.takeaway.service.OrderService;
-import com.easterfg.takeaway.utils.constant.GlobalConstant;
+import com.easterfg.takeaway.utils.enums.OrderStatus;
 import com.easterfg.takeaway.utils.security.Authorize;
 import com.easterfg.takeaway.utils.security.Role;
 import com.easterfg.takeaway.utils.security.UserContext;
@@ -65,7 +65,6 @@ public class OrderController {
     @PostMapping("/submit")
     public ResponseEntity<Result> submitOrder(@Validated @RequestBody OrdersDTO ordersDTO) {
         Map<String, Object> map = orderService.placeAnOrder(ordersDTO);
-//        UserContext.destroy();
         // 返回 201, 通知客户端成功
         return ResponseEntity
                 .created(URI.create("order/" + map.get("tradeNo")))
@@ -76,40 +75,29 @@ public class OrderController {
     @Authorize
     @GetMapping("/list")
     public Result listOrder(@Validated PageQuery pageQuery, Integer status) {
+        log.info("pq {}", pageQuery.toString());
+        // 根据前端传递的值,获取枚举
+        OrderStatus os = null;
+        if (status != null) {
+            os = OrderStatus.valueOf(status);
+        }
+        log.info("status {}", status);
         UserContext.User user = UserContext.getUser();
-        PageData<Order> pageData = orderService.listOrder(pageQuery, status,
+        PageData<Order> pageData = orderService.listOrder(pageQuery, os,
                 user.hasRole(Role.USER) ? user.getId() : null);
-//        UserContext.destroy();
         return Result.success(pageData);
     }
 
     @Authorize
     @GetMapping("{id}")
     public Result getOrder(@PathVariable Long id) {
-        Order order = orderService.getOrder(id);
-//        Order order = orderMapper.getOrder(id);
-//        if (order == null) {
-//            return ResponseEntity.ok(Result.failed("A0410", "订单数据不存在"));
-//        }
-//        UserContext.User user = UserContext.getUser();
-//        Long uid = user.getId();
-//        // 权限校验
-//        if (user.hasRole(Role.USER) && !uid.equals(order.getUserId())) {
-//            // 不属于当前用户
-//            return ResponseEntity
-//                    .status(HttpStatus.FORBIDDEN)
-//                    .body(Result.failed("A0411", "拒绝访问"));
-//        }
-        // 如果订单未支付, 启动异步查询
-//        UserContext.destroy();
-        // 属于当前用户 / 是员工
-        return Result.success(order);
+        return Result.success(orderService.getOrder(id));
     }
 
-    @GetMapping("/statistics")
-    public Result statistics() {
+    @GetMapping("/count")
+    public Result orderCount() {
         // 查询信息
-        return Result.success(orderService.statistics());
+        return Result.success(orderService.orderCount());
     }
 
     @Authorize
@@ -128,8 +116,8 @@ public class OrderController {
      */
     @PostMapping("/approve/{tradeNo}")
     public Result approveOrder(@PathVariable("tradeNo") Long tradeNo) {
-        if (orderService.updateOrderStatus(tradeNo, GlobalConstant.WAIT_APPROVAL,
-                GlobalConstant.WAIT_DELIVERY)) {
+        if (orderService.updateOrderStatus(tradeNo, OrderStatus.WAIT_ACCEPT,
+                OrderStatus.WAIT_DELIVERY)) {
             return Result.success();
         }
         return Result.failed("接单失败");
@@ -141,8 +129,8 @@ public class OrderController {
     @Authorize(Role.EMPLOYEE)
     @PostMapping("/delivery/{tradeNo}")
     public Result deliveryOrder(@PathVariable("tradeNo") Long tradeNo) {
-        if (orderService.updateOrderStatus(tradeNo, GlobalConstant.WAIT_DELIVERY,
-                GlobalConstant.DISTRIBUTION)) {
+        if (orderService.updateOrderStatus(tradeNo, OrderStatus.WAIT_DELIVERY,
+                OrderStatus.DELIVERING)) {
             return Result.success();
         }
         return Result.failed("failed");
@@ -155,8 +143,8 @@ public class OrderController {
     @Authorize(Role.EMPLOYEE)
     @PostMapping("/complete/{tradeNo}")
     public Result completeOrder(@PathVariable("tradeNo") Long tradeNo) {
-        if (orderService.updateOrderStatus(tradeNo, GlobalConstant.DISTRIBUTION,
-                GlobalConstant.FINISH)) {
+        if (orderService.updateOrderStatus(tradeNo, OrderStatus.DELIVERING,
+                OrderStatus.FINISHED)) {
             return Result.success();
         }
         return Result.failed("failed");

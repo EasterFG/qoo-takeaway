@@ -20,6 +20,8 @@ import com.easterfg.takeaway.utils.MapUtils;
 import com.easterfg.takeaway.utils.OrderLogRecord;
 import com.easterfg.takeaway.utils.SnowflakeIdWorker;
 import com.easterfg.takeaway.utils.constant.GlobalConstant;
+import com.easterfg.takeaway.utils.enums.OrderStatus;
+import com.easterfg.takeaway.utils.enums.PayStatus;
 import com.easterfg.takeaway.utils.security.Role;
 import com.easterfg.takeaway.utils.security.UserContext;
 import com.github.pagehelper.PageInfo;
@@ -148,13 +150,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDAO, Order> implements Or
                 OrderDetail od = new OrderDetail();
                 od.setName(cart.getName());
                 od.setImage(cart.getImage());
-                od.setOrderId(order.getId());
+                od.setTradeNo(order.getTradeNo());
+//                od.setOrderId(order.getId());
                 od.setDishId(cart.getDishId());
                 od.setComboId(cart.getComboId());
                 od.setDishFlavor(cart.getDishFlavor());
                 od.setNumber(cart.getNumber());
                 od.setAmount(cart.getAmount());
-                od.setOrderId(order.getId());
+//                od.setOrderId(order.getId());
                 count += dao.insert(od);
             }
             sqlSession.commit();
@@ -206,8 +209,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDAO, Order> implements Or
         if (user.hasRole(Role.USER) && !order.getUserId().equals(user.getId())) {
             throw new AccessDeniedException("服务器繁忙, 请稍后再试");
         }
-        // 如果订单为支付, 调用支付接口查询信息
-        if (order.getPayStatus() == 0 && order.getStatus() == GlobalConstant.WAIT_PAYMENT) {
+        // 如果订单未支付, 调用支付接口查询信息
+        if (order.getPayStatus() == PayStatus.UNPAID && order.getStatus() == OrderStatus.WAIT_PAYMENT) {
             // 主动查询订单信息
             PayQueryDTO query = payService.queryOrder(tradeNo);
             log.info("订单信息查询 tid: {}, status: {}", tradeNo, query);
@@ -218,12 +221,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderDAO, Order> implements Or
 //                o1.setStatus(GlobalConstant.WAIT_APPROVAL);
                 order.setTradeNo(tradeNo);
                 order.setOutTradeNo(query.getOutTradeNo());
-                order.setStatus(GlobalConstant.WAIT_APPROVAL);
-                order.setPayStatus(1);
+                order.setStatus(OrderStatus.WAIT_ACCEPT);
+                order.setPayStatus(PayStatus.PAID);
                 order.setPaymentTime(query.getPaymentTime());
 //                o1.setPayStatus(1);
 //                o1.setPaymentTime(query.getPaymentTime());
-                orderDAO.updateStatus(order, 1);
+                // 把 WAIT_PAYMENT 修改成 WAIT_ACCEPT
+//                orderDAO.updateOrderStatus(tradeNo, OrderStatus.WAIT_ACCEPT, OrderStatus.WAIT_PAYMENT);
+//                orderDAO.updateStatus(order, 1);
+                orderDAO.updateOrder2(order, OrderStatus.WAIT_PAYMENT);
                 // 修改已经获取的订单状态
                 orderOperateService.recordLog(user, tradeNo, "用户支付订单",
                         GlobalConstant.WAIT_APPROVAL);
@@ -267,7 +273,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDAO, Order> implements Or
 //    }
 
     @Override
-    public OrderStatusStatistics statistics() {
+    public OrderStatusCount orderCount() {
         return orderDAO.statistics();
     }
 
@@ -285,22 +291,22 @@ public class OrderServiceImpl extends ServiceImpl<OrderDAO, Order> implements Or
         // 只允许在等待商家接单时允许取消
         if (uid == null) {
             // 验证订单是否属于当前用户
-            if (order.getStatus() > 4) {
+            if (order.getStatus().getCode() > 4) {
                 throw new BusinessException("订单不允许取消");
             }
         } else {
             // 预期为 2
-            if (order.getStatus() != GlobalConstant.WAIT_PAYMENT &&
-                    order.getStatus() != GlobalConstant.WAIT_APPROVAL) {
+            if (order.getStatus() != OrderStatus.WAIT_PAYMENT &&
+                    order.getStatus() != OrderStatus.WAIT_ACCEPT) {
                 throw new BusinessException("订单取消失败， 请联系商家处理");
             }
         }
         // 更新状态
         Order o1 = new Order();
-        o1.setStatus(GlobalConstant.CANCEL);
+        o1.setTradeNo(tradeNo);
+        o1.setStatus(OrderStatus.CANCELLED);
         o1.setCloseTime(LocalDateTime.now());
         o1.setCancelReason(cancelReason);
-        o1.setTradeNo(tradeNo);
         // 移除对应定时任务
         Optional.ofNullable(orderTimeout.remove(tradeNo)).ifPresent(Timeout::cancel);
         // 修改数据库数据
@@ -310,16 +316,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderDAO, Order> implements Or
 //                .set(Order::getCancelReason, cancelReason)
 //                .eq(Order::getTradeNo, tradeNo);
         // 订单未支付, 通知支付平台取消订单
-        if (order.getPayStatus() == 0) {
+        if (order.getPayStatus() == PayStatus.UNPAID) {
             payService.cancel(tradeNo);
-        } else if (order.getPayStatus() == 1 && order.getStatus() == GlobalConstant.WAIT_APPROVAL) {
+        } else if (order.getPayStatus() == PayStatus.PAID && order.getStatus() == OrderStatus.WAIT_ACCEPT) {
             // 通过支付宝流水号退款
             // 订单已经支付 等待商家接单时， 通知支付宝退款, 异步修改订单支付状态
             payService.refund(order.getOutTradeNo(), order.getAmount().doubleValue());
             // 设置支付状态
         }
+        orderDAO.updateOrder(o1);
         // 通过预期值来确保幂等
-        orderDAO.updateStatus(o1, order.getStatus());
+//        orderDAO.updateStatus(o1, order.getStatus().getCode());
     }
 
 //    @OrderLogRecord(value = "商家接单",
@@ -359,35 +366,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderDAO, Order> implements Or
 
     @Transactional
     @Override
-    public boolean updateOrderStatus(long tradeNo, int expected, int actual) {
+    public boolean updateOrderStatus(long tradeNo, OrderStatus expected, OrderStatus actual) {
         // 接单 配送 完成 状态更新
         Order order = new Order();
         order.setStatus(actual);
         order.setTradeNo(tradeNo);
         // 如果是完成状态, 就设置取消时间
-        if (actual == GlobalConstant.FINISH) {
+        if (actual == OrderStatus.FINISHED) {
             order.setCloseTime(LocalDateTime.now());
         }
         // 更新订单状态
-        int row = orderDAO.updateStatus(order, expected);
+        int row = orderDAO.updateOrder2(order, expected);
         if (row > 0) {
             // 记录日志
             UserContext.User user = UserContext.getUser();
             String message;
             switch (actual) {
-                case 3:
+                case WAIT_DELIVERY:
                     message = "商家接单";
                     break;
-                case 4:
+                case DELIVERING:
                     message = "订单开始配送";
                     break;
-                case 5:
+                case FINISHED:
                     message = "订单配送完成";
                     break;
                 default:
                     message = "未知操作";
             }
-            orderOperateService.recordLog(user, tradeNo, message, actual);
+            orderOperateService.recordLog(user, tradeNo, message, actual.getCode());
             return true;
         }
         return false;
@@ -400,7 +407,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDAO, Order> implements Or
         if (order == null) {
             throw new BusinessException(ORDER_NOT_EXISTS);
         }
-        if (order.getPayStatus() != 1) {
+        if (order.getPayStatus() != PayStatus.PAID) {
             // 订单不能退款
             throw new BusinessException("订单不能退款");
         }
@@ -421,7 +428,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDAO, Order> implements Or
     }
 
     @Override
-    public PageData<Order> listOrder(PageQuery pageQuery, Integer status, Long uid) {
+    public PageData<Order> listOrder(PageQuery pageQuery, OrderStatus status, Long uid) {
         if (uid != null) {
             PageMethod.startPage(pageQuery.getPage(), pageQuery.getPageSize());
             List<Order> orders = orderDAO.listUserOrder(uid);
@@ -442,11 +449,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderDAO, Order> implements Or
 //            pageData.setRecords(records);
         } else {
             // 查询全部数据
-            PageMethod.startPage(pageQuery.getPage(), pageQuery.getPageSize());
-            List<Order> orders = orderDAO.listOrder(status);
-            PageInfo<Order> info = new PageInfo<>(orders);
-            info.getList().forEach(order -> order.setOrderDetails(orderDetailDAO.listOrderDetail(order.getId())));
-            return new PageData<>(info);
+//            PageMethod.startPage(pageQuery.getPage(), pageQuery.getPageSize());
+            // 手动分页
+            int total = orderDAO.countByStatus(status);
+            pageQuery.check(total);
+            List<Order> orders = orderDAO.listOrder(status,
+                    (pageQuery.getPage() - 1) * pageQuery.getPageSize(), pageQuery.getPageSize());
+//            PageInfo<Order> info = new PageInfo<>(orders);
+            orders.forEach(order -> order.setOrderDetails(orderDetailDAO.listOrderDetail(order.getTradeNo())));
+            return new PageData<>(total, orders);
 //            LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>(Order.class)
 //                    .eq(status != null, Order::getStatus, status);
 //            Page<Order> page = new Page<>(pageQuery.getPage(), pageQuery.getPageSize());

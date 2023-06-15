@@ -2,6 +2,7 @@ package com.easterfg.takeaway.dao;
 
 import com.easterfg.takeaway.domain.Employee;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -29,4 +30,7 @@ public interface EmployeeDAO {
 
     @Update("update employee set is_deleted = 1, update_time = now() where is_deleted = 0 and id = #{id};")
     int deleteById(Long id);
+
+    @Update("update employee set password = #{password} where id = #{id} and is_deleted = 0")
+    int updatePassword(@Param("id") Long id, @Param("password") String password);
 }

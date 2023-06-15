@@ -5,6 +5,7 @@ import com.easterfg.takeaway.dto.Result;
 import com.easterfg.takeaway.service.AddressBookService;
 import com.easterfg.takeaway.utils.security.Authorize;
 import com.easterfg.takeaway.utils.security.Role;
+import com.easterfg.takeaway.utils.security.UserContext;
 import com.easterfg.takeaway.validator.group.AddOperate;
 import com.easterfg.takeaway.validator.group.UpdateOperate;
 import io.swagger.annotations.Api;
@@ -13,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 
 /**
  * @author EasterFG on 2022/10/23
@@ -62,6 +64,10 @@ public class AddressBookController {
 //        wrapper.eq(AddressBook::getUserId, uid).eq(AddressBook::getId, id);
 //        addressBookService.updateAddress(addressBook);
 //        boolean update = addressBookService.update(addressBook, wrapper);
+        Long uid = UserContext.getUserId();
+        addressBook.setId(id);
+        addressBook.setUserId(uid);
+        addressBook.setUpdateTime(LocalDateTime.now());
         if (addressBookService.updateAddress(addressBook) > 0) {
             return Result.success();
         }

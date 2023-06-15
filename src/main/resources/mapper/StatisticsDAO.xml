@@ -6,12 +6,13 @@
     <select id="listStatistics" resultType="com.easterfg.takeaway.domain.Statistics">
         select turnover, total_order, complete_order, cancel_order, user_count, create_time
         from statistics
-        where
-        <if test="start == null and end != null">
-            create_time = #{end};
-        </if>
-        <if test="start != null and end != null">
-            create_time between #{start} and #{end};
-        </if>
+        <where>
+            <if test="start != null and end != null">
+                create_time between #{start} and #{end}
+            </if>
+            <if test="start == null and end != null">
+                and create_time = #{end}
+            </if>
+        </where>
     </select>
 </mapper>

@@ -22,6 +22,7 @@ public class BusinessException extends RuntimeException {
      * 40006 权限不足
      * 40007 校验失败
      * 40008 拒绝服务异常
+     * 40009 登录凭证过期
      * 50000 服务器未知异常
      */
     private final String code;

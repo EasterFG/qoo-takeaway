@@ -2,10 +2,11 @@ package com.easterfg.takeaway.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.easterfg.takeaway.domain.Order;
-import com.easterfg.takeaway.domain.OrderStatusStatistics;
+import com.easterfg.takeaway.domain.OrderStatusCount;
 import com.easterfg.takeaway.dto.OrdersDTO;
 import com.easterfg.takeaway.dto.PageData;
 import com.easterfg.takeaway.query.PageQuery;
+import com.easterfg.takeaway.utils.enums.OrderStatus;
 
 import java.util.Map;
 
@@ -37,8 +38,10 @@ public interface OrderService extends IService<Order> {
 
     /**
      * 统计状态
+     *
+     * @return
      */
-    OrderStatusStatistics statistics();
+    OrderStatusCount orderCount();
 
     /**
      * 取消订单
@@ -80,7 +83,7 @@ public interface OrderService extends IService<Order> {
      * @param actual   实际状态
      * @return 是否修改成功
      */
-    boolean updateOrderStatus(long tradeNo, int expected, int actual);
+    boolean updateOrderStatus(long tradeNo, OrderStatus expected, OrderStatus actual);
 
     /**
      * 订单退款
@@ -89,5 +92,5 @@ public interface OrderService extends IService<Order> {
      */
     void refundOrder(long tradeNo, double amount);
 
-    PageData<Order> listOrder(PageQuery pageQuery, Integer status, Long uid);
+    PageData<Order> listOrder(PageQuery pageQuery, OrderStatus status, Long uid);
 }

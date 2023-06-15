@@ -23,6 +23,8 @@ import com.easterfg.takeaway.dto.PayQueryDTO;
 import com.easterfg.takeaway.exception.BusinessException;
 import com.easterfg.takeaway.service.PayService;
 import com.easterfg.takeaway.utils.constant.GlobalConstant;
+import com.easterfg.takeaway.utils.enums.OrderStatus;
+import com.easterfg.takeaway.utils.enums.PayStatus;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -69,8 +71,8 @@ public class AlipayMobileServiceImpl implements PayService {
             wrapper.eq(Order::getTradeNo, tradeNo);
             Order order = new Order();
             order.setOutTradeNo(outTradeNo);
-            order.setPayStatus(1);
-            order.setStatus(2);
+            order.setPayStatus(PayStatus.PAID);
+            order.setStatus(OrderStatus.WAIT_ACCEPT);
             // 设置支付时间
             order.setPaymentTime(LocalDateTime.parse(payment,
                     GlobalConstant.DEFAULT_FORMATTER));

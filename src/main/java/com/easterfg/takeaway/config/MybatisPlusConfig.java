@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @author EasterFG on 2022/9/19
  */
 @Configuration
-@MapperScan("com.easterfg.takeaway.dao")
+@MapperScan(basePackages = "com.easterfg.takeaway.dao")
 public class MybatisPlusConfig {
 
 

@@ -41,8 +41,10 @@ public class DishServiceImpl implements DishService {
     @Resource
     private SqlSessionFactory sqlSessionFactory;
 
-    @Override
+//    @Resource
+//    private RedisTemplate<String, Object> redisTemplate;
 
+    @Override
     public PageData<Dish> listDish(PageQuery query, String name, Long categoryId, Integer status) {
         Dish dish = new Dish();
         dish.setName(name);
@@ -55,6 +57,7 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
+//    @Cacheable(value = "dishCache", key = "#id", unless = "#result == null")
     public Dish getDish(Long id) {
         // 查询Dish
         Dish dish = dishDAO.findById(id);

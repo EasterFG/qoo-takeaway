@@ -3,4 +3,6 @@ target/
 *.ipr
 *.iws
 .idea/
+src/main/resources/application.yml
+src/test/
 upload/
