@@ -52,4 +52,4 @@
 
 ## 版权信息
 
-该项目遵循GPL-3.0 License开源协议，详情请参考 [LICENSE](https://github.com/EasterFG/qoo-takeaway/blob/main/LICENSE)。
+该项目遵循GPL-3.0 License开源协议，详情请参考 [LICENSE](https://github.com/EasterFG/qoo-takeaway/blob/master/LICENSE)。
