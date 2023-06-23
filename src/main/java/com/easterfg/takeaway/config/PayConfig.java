@@ -35,6 +35,8 @@ public class PayConfig {
 
     private String privateKey;
 
+    private String alipayPublicKey;
+
     /**
      * 支付宝付款接口配置
      */
