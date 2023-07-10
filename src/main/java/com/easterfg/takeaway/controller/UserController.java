@@ -9,8 +9,8 @@ import com.easterfg.takeaway.utils.MapUtils;
 import com.easterfg.takeaway.utils.security.Authorize;
 import com.easterfg.takeaway.utils.security.Role;
 import com.easterfg.takeaway.utils.security.UserContext;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+// import io.swagger.annotations.Api;
+// import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,14 +22,14 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping(value = "/user")
-@Api(tags = "用户接口")
+// @Api(tags = "用户接口")
 public class UserController {
 
 
     @Resource
     private UserService userService;
 
-    @ApiOperation("用户登录接口")
+    // @ApiOperation("用户登录接口")
     @PostMapping(value = "/login")
 
     public Result login(@Validated @RequestBody EmployeeLoginDTO employeeLoginDTO) {
@@ -45,7 +45,7 @@ public class UserController {
     /**
      * 用户注册
      */
-    @ApiOperation("用户注册接口")
+    // @ApiOperation("用户注册接口")
     @PostMapping("/register")
     public Result register(@Validated @RequestBody User user) {
         return userService.register(user);
@@ -56,7 +56,7 @@ public class UserController {
      * 查询用户信息
      */
     @Authorize(Role.USER)
-    @ApiOperation("获取当前用户详情")
+    // @ApiOperation("获取当前用户详情")
     @GetMapping
     public Result getUserInfo() {
         UserContext.User context = UserContext.getUser();
@@ -74,7 +74,7 @@ public class UserController {
     }
 
     @Authorize(Role.EMPLOYEE)
-    @ApiOperation("获取用户总数")
+    // @ApiOperation("获取用户总数")
     @GetMapping("/count")
     public Result countUser() {
         return Result.success(userService.count());

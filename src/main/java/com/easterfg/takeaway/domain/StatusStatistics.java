@@ -1,6 +1,6 @@
 package com.easterfg.takeaway.domain;
 
-import com.easterfg.takeaway.utils.enums.OrderStatus;
+import com.easterfg.takeaway.enums.OrderStatus;
 import lombok.Data;
 
 /**

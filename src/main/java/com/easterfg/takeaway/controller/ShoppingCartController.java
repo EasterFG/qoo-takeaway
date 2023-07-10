@@ -9,8 +9,8 @@ import com.easterfg.takeaway.dto.Result;
 import com.easterfg.takeaway.utils.security.Authorize;
 import com.easterfg.takeaway.utils.security.Role;
 import com.easterfg.takeaway.utils.security.UserContext;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+// import io.swagger.annotations.Api;
+// import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,13 +23,13 @@ import java.util.List;
 @Authorize(Role.USER)
 @RestController
 @RequestMapping("/shopping-cart")
-@Api(tags = "购物车")
+// @Api(tags = "购物车")
 public class ShoppingCartController {
 
     @Resource
     private ShoppingCartService shoppingCartService;
 
-    @ApiOperation("列出用户的购物车")
+    // @ApiOperation("列出用户的购物车")
     @GetMapping("/list")
     public Result list() {
         //
@@ -38,7 +38,7 @@ public class ShoppingCartController {
         return Result.success(list);
     }
 
-    @ApiOperation("添加菜品到购物车中")
+    // @ApiOperation("添加菜品到购物车中")
     @PostMapping("add")
     public Result addDish(@Validated @RequestBody ShoppingCart shoppingCart) {
         // 手动验证
@@ -46,13 +46,13 @@ public class ShoppingCartController {
     }
 
 
-    @ApiOperation("从购物车扣除商品")
+    // @ApiOperation("从购物车扣除商品")
     @PostMapping("sub")
     public Result subDish(@RequestBody ShoppingCart shoppingCart) {
         return shoppingCartService.subDish(shoppingCart.getDishId(), shoppingCart.getComboId());
     }
 
-    @ApiOperation("清空购物车")
+    // @ApiOperation("清空购物车")
     @DeleteMapping("clean")
     public Result cleanCart() {
         UserContext.User user = UserContext.getUser();

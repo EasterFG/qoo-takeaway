@@ -10,8 +10,8 @@ import com.easterfg.takeaway.utils.security.Authorize;
 import com.easterfg.takeaway.utils.security.Role;
 import com.easterfg.takeaway.validator.group.AddOperate;
 import com.easterfg.takeaway.validator.group.UpdateOperate;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+// import io.swagger.annotations.Api;
+// import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +26,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/dish")
 @Slf4j
-@Api(tags = "菜品接口")
+// @Api(tags = "菜品接口")
 public class DishController {
 
     @Resource
@@ -35,7 +35,7 @@ public class DishController {
     /**
      * 查询所有菜品
      */
-    @ApiOperation("分页查询菜品")
+    // @ApiOperation("分页查询菜品")
     @GetMapping("page")
     public Result pageDish(@Validated PageQuery query, String name, Long categoryId, Integer status) {
         PageData<Dish> pageData = dishService.listDish(query, name, categoryId, status);

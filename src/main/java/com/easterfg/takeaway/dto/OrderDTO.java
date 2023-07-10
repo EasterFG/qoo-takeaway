@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
  * @author EasterFG on 2022/10/24
  */
 @Data
-public class OrdersDTO {
+public class OrderDTO {
 
     /**
      * 备注

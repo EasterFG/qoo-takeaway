@@ -31,7 +31,7 @@ public interface PayService {
      * 退款接口
      */
     @Async
-    Future<Boolean> refund(String outTradeNo, double amount);
+    Future<Boolean> refund(Long tradeNo, String outTradeNo, double amount);
 
     /**
      * 取消订单接口

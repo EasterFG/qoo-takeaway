@@ -37,9 +37,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     public void autoStatistics() {
         // 每天凌晨统计上一日数据
         // 获取当前时间的前一, 确保时间一定是当天的00:00
-        LocalDate minusDays = LocalDate.now().minusDays(1);
-        LocalDateTime time = LocalDateTime.of(minusDays.getYear(), minusDays.getMonth(), minusDays.getDayOfMonth(),
-                0, 0);
+        LocalDate time = LocalDate.now().minusDays(1);
         List<StatusStatistics> lists = orderDAO.statisticsByDate(time);
         BigDecimal decimal = orderDAO.statisticsAmount(time);
         int userAmount = userDAO.countUserByDate(time);
@@ -58,8 +56,9 @@ public class StatisticsServiceImpl implements StatisticsService {
         }
         statistics.setTotalOrder(total);
         statistics.setTurnover(decimal);
-        statistics.setCreateTime(time.toLocalDate());
+        statistics.setCreateTime(time);
         statistics.setUserCount(userAmount);
+        // 插入报错
         statisticsDAO.insertStatistics(statistics);
     }
 

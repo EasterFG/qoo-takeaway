@@ -8,8 +8,8 @@ import com.easterfg.takeaway.utils.security.Role;
 import com.easterfg.takeaway.utils.security.UserContext;
 import com.easterfg.takeaway.validator.group.AddOperate;
 import com.easterfg.takeaway.validator.group.UpdateOperate;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+// import io.swagger.annotations.Api;
+// import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,13 +22,13 @@ import java.time.LocalDateTime;
 @Authorize(Role.USER)
 @RestController
 @RequestMapping("/address")
-@Api(tags = "地址接口")
+// @Api(tags = "地址接口")
 public class AddressBookController {
 
     @Resource
     private AddressBookService addressBookService;
 
-    @ApiOperation("获取默认地址")
+    // @ApiOperation("获取默认地址")
     @GetMapping("/default")
     public Result getDefaultAddress() {
         AddressBook defaultAddress = addressBookService.getDefaultAddress();
@@ -40,11 +40,6 @@ public class AddressBookController {
 
     @GetMapping("/list")
     public Result listAddress() {
-//        Long uid = UserContext.getUserId();
-//        LambdaQueryWrapper<AddressBook> wrapper = Wrappers.lambdaQuery(AddressBook.class);
-//        wrapper.select(AddressBook::getId, AddressBook::getConsignee, AddressBook::getDetail, AddressBook::getPhone,
-//                AddressBook::getDefaults, AddressBook::getLabel, AddressBook::getGender, AddressBook::getCity);
-//        wrapper.eq(AddressBook::getUserId, uid);
         return Result.success(addressBookService.listAddress());
     }
 
@@ -59,11 +54,6 @@ public class AddressBookController {
 
     @PutMapping("{id}")
     public Result editAddress(@PathVariable Long id, @RequestBody @Validated(UpdateOperate.class) AddressBook addressBook) {
-//        Long uid = UserContext.getUserId();
-//        LambdaQueryWrapper<AddressBook> wrapper = Wrappers.lambdaQuery(AddressBook.class);
-//        wrapper.eq(AddressBook::getUserId, uid).eq(AddressBook::getId, id);
-//        addressBookService.updateAddress(addressBook);
-//        boolean update = addressBookService.update(addressBook, wrapper);
         Long uid = UserContext.getUserId();
         addressBook.setId(id);
         addressBook.setUserId(uid);

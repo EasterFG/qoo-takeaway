@@ -10,8 +10,8 @@ import com.easterfg.takeaway.utils.security.Authorize;
 import com.easterfg.takeaway.utils.security.Role;
 import com.easterfg.takeaway.validator.group.AddOperate;
 import com.easterfg.takeaway.validator.group.UpdateOperate;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+// import io.swagger.annotations.Api;
+// import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +26,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/employee")
 @Slf4j
-@Api(tags = "员工接口")
+// @Api(tags = "员工接口")
 public class EmployeeController {
 
     @Resource
@@ -35,7 +35,7 @@ public class EmployeeController {
     /**
      * 员工登录
      */
-    @ApiOperation("员工登录接口")
+    // @ApiOperation("员工登录接口")
     @PostMapping("/login")
     public Result login(@Validated @RequestBody EmployeeLoginDTO employeeLoginDto) {
         return Result.success("success", employeeService.login(employeeLoginDto));
@@ -73,7 +73,7 @@ public class EmployeeController {
      * 查询所有员工
      */
     @Authorize(Role.ADMIN)
-    @ApiOperation("查询所有员工")
+    // @ApiOperation("查询所有员工")
     @GetMapping("/page")
     public Result pageEmployee(@Validated PageQuery query, String name) {
         return Result.success(employeeService.listEmployee(query, name));
@@ -85,7 +85,7 @@ public class EmployeeController {
      * 逻辑删除自动匹配
      */
     @Authorize(Role.ADMIN)
-    @ApiOperation("通过id查询员工")
+    // @ApiOperation("通过id查询员工")
     @GetMapping("/{id}")
     public Result getEmployee(@PathVariable Long id) {
         return Result.success(employeeService.getEmployee(id));
@@ -95,7 +95,7 @@ public class EmployeeController {
      * 更新状态
      */
     @Authorize(Role.ADMIN)
-    @ApiOperation("更新员工状态")
+    // @ApiOperation("更新员工状态")
     @PatchMapping("status/{status}")
     public Result updateEmployeeStatus(@PathVariable Integer status, @RequestParam Long id) {
         if (status < 0 || status > 1) {
@@ -113,7 +113,7 @@ public class EmployeeController {
      * 更新员工
      */
     @Authorize(Role.ADMIN)
-    @ApiOperation("更新员工数据")
+    // @ApiOperation("更新员工数据")
     @PutMapping
     public Result updateEmployee(@Validated(UpdateOperate.class) @RequestBody Employee employee) {
         if ("admin".equals(employee.getUsername())) {
@@ -127,7 +127,7 @@ public class EmployeeController {
      * 新增员工
      */
     @Authorize(Role.ADMIN)
-    @ApiOperation("新增员工")
+    // @ApiOperation("新增员工")
     @PostMapping
     public Result addEmployee(@Validated(AddOperate.class) @RequestBody Employee employee) {
         // 通过数据库抛出的唯一键异常来验证
@@ -139,7 +139,7 @@ public class EmployeeController {
      * 删除员工
      */
     @Authorize(Role.ADMIN)
-    @ApiOperation("根据id删除员工")
+    // @ApiOperation("根据id删除员工")
     @DeleteMapping("{id}")
     public Result deleteEmployee(@PathVariable Long id) {
         // 采用逻辑删除功能

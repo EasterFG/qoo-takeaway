@@ -1,13 +1,19 @@
 package com.easterfg.takeaway.controller;
 
+import com.easterfg.takeaway.enums.OrderStatus;
+import com.easterfg.takeaway.machine.OrderStateListener;
 import com.easterfg.takeaway.utils.constant.SseConstant;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 import java.io.IOException;
 import java.util.Map;
@@ -23,40 +29,32 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class SseController {
 
-    private static final Map<Long, SseEmitter> SSE_CACHE = new ConcurrentHashMap<>();
+    private final OrderStateListener orderStateListener;
+
+    @Autowired
+    public SseController(OrderStateListener orderStateListener) {
+        this.orderStateListener = orderStateListener;
+    }
 
     /**
      * 订阅服务器通知
      *
      * @param tradeNo 订单编号
      */
-    @GetMapping("subscribe")
-    public SseEmitter subscribeOrder(Long tradeNo) {
-        // 设置超时时间为 3600
-        SseEmitter sseEmitter = new SseEmitter(3600000L);
-        SSE_CACHE.put(tradeNo, sseEmitter);
-        sseEmitter.onTimeout(() -> SSE_CACHE.remove(tradeNo));
-        sseEmitter.onCompletion(() -> log.info("sse completion"));
-        return sseEmitter;
+    @GetMapping(value = "/order/{tradeNo}/status", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<OrderStatus>> subscribeOrder(@PathVariable Long tradeNo) {
+        log.info("trade status {}", tradeNo);
+        Sinks.Many<OrderStatus> many = orderStateListener.addEmitter(tradeNo);
+
+        return many.asFlux().map(data -> ServerSentEvent.builder(data).build())
+                .doFinally(signalType -> orderStateListener.removeEmitter(tradeNo));
     }
 
-    @GetMapping("/wait")
-    public SseEmitter waitOrder() throws IOException {
-        SseEmitter sseEmitter = new SseEmitter(3600000L);
-        int id = SseConstant.WAIT_ID.getAndIncrement();
-        SseConstant.WAIT_EMITTER.put(id, sseEmitter);
-        sseEmitter.onTimeout(() -> SseConstant.WAIT_EMITTER.remove(id));
-        sseEmitter.send("{id:" + id + "}", MediaType.APPLICATION_JSON);
-        return sseEmitter;
-    }
-
-    @GetMapping("push")
-    public String push(@RequestParam Integer id, String content) throws IOException {
-        SseEmitter sseEmitter = SseConstant.WAIT_EMITTER.get(id);
-        if (sseEmitter != null) {
-            sseEmitter.send(content, MediaType.TEXT_PLAIN);
+    @GetMapping("{tradeNo}/send")
+    public void sendMessage(@PathVariable Long tradeNo, Integer status) {
+        Sinks.Many<OrderStatus> skins = orderStateListener.get(tradeNo);
+        if (skins != null) {
+            skins.tryEmitNext(OrderStatus.valueOf(status));
         }
-        return "over";
     }
-
 }

@@ -1,8 +1,8 @@
 package com.easterfg.takeaway.dto;
 
 import com.easterfg.takeaway.utils.ErrorCode;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+// import io.swagger.annotations.ApiModel;
+// import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +15,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@ApiModel("通用响应数据")
+// @ApiModel("通用响应数据")
 public class Result implements Serializable {
 
     private static final long serialVersionUID = 1572429473955502146L;
@@ -23,19 +23,19 @@ public class Result implements Serializable {
     /**
      * 返回码
      */
-    @ApiModelProperty(value = "状态码", example = "A1000")
+    // // @ApiModelProperty(value = "状态码", example = "A1000")
     private String code;
 
     /**
      * 操作消息
      */
-    @ApiModelProperty(value = "返回消息", example = "成功")
+    // // @ApiModelProperty(value = "返回消息", example = "成功")
     private String message;
 
     /**
      * 返回数据
      */
-    @ApiModelProperty(value = "响应数据")
+    // // @ApiModelProperty(value = "响应数据")
     private Object data;
 
     public static Result success(String message, Object data) {

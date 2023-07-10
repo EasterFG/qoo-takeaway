@@ -4,5 +4,6 @@ target/
 *.iws
 .idea/
 src/main/resources/application.yml
+src/main/resources/ssl
 src/test/
 upload/

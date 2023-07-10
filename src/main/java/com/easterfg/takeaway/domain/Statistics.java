@@ -2,6 +2,7 @@ package com.easterfg.takeaway.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
 import lombok.Data;
 
 @Data
@@ -19,22 +20,22 @@ public class Statistics {
     /**
      * 总订单
      */
-    private Integer totalOrder;
+    private int totalOrder;
 
     /**
      * 完成订单
      */
-    private Integer completeOrder;
+    private int completeOrder;
 
     /**
      * 取消订单
      */
-    private Integer cancelOrder;
+    private int cancelOrder;
 
     /**
      * 用户数
      */
-    private Integer userCount;
+    private int userCount;
 
     /**
      * 记录时间

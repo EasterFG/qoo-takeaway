@@ -3,8 +3,8 @@ package com.easterfg.takeaway.controller;
 import com.easterfg.takeaway.dto.Result;
 import com.easterfg.takeaway.utils.ErrorCode;
 import com.easterfg.takeaway.utils.ImageUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+// import io.swagger.annotations.Api;
+// import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/common")
 @Slf4j
-@Api(tags = "通用工具接口")
+// @Api(tags = "通用工具接口")
 public class CommonController {
 
     @Value("${upload.path}")
@@ -37,7 +37,7 @@ public class CommonController {
      * 文件上传
      */
 //    @Authorize(Role.EMPLOYEE)
-    @ApiOperation("文件上传")
+    // @ApiOperation("文件上传")
     @PostMapping("upload")
     public Result uploadImage(@RequestParam("file") MultipartFile file) {
         if (file == null) {
@@ -70,7 +70,7 @@ public class CommonController {
     /**
      * 通过图片名称获取图片
      */
-    @ApiOperation("文件下载")
+    // @ApiOperation("文件下载")
     @GetMapping(value = "/download/{name}",
             produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<BufferedImage> downloadImage(@PathVariable String name) throws IOException {

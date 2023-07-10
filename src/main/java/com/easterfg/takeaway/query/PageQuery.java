@@ -1,6 +1,6 @@
 package com.easterfg.takeaway.query;
 
-import io.swagger.annotations.ApiModelProperty;
+// import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,12 +15,12 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class PageQuery {
 
-    @ApiModelProperty("页数")
+    // // @ApiModelProperty("页数")
     @NotNull
 //    @Min(value = 1, message = "页数不能小于1")
     private int page;
 
-    @ApiModelProperty("分页大小")
+    // // @ApiModelProperty("分页大小")
     @NotNull
 //    @Range(min = 5, max = 40, message = "分页大小必须在5~40之间")
     private int pageSize;

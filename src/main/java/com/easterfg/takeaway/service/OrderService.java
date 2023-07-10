@@ -1,27 +1,54 @@
 package com.easterfg.takeaway.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.easterfg.takeaway.domain.Order;
 import com.easterfg.takeaway.domain.OrderStatusCount;
-import com.easterfg.takeaway.dto.OrdersDTO;
+import com.easterfg.takeaway.dto.OrderDTO;
 import com.easterfg.takeaway.dto.PageData;
+import com.easterfg.takeaway.dto.RefundDTO;
+import com.easterfg.takeaway.dto.Result;
+import com.easterfg.takeaway.enums.OrderStatus;
 import com.easterfg.takeaway.query.PageQuery;
-import com.easterfg.takeaway.utils.enums.OrderStatus;
+import com.easterfg.takeaway.utils.security.Role;
 
-import java.util.Map;
+import java.time.LocalDate;
 
 /**
  * @author EasterFG on 2022/10/24
  */
-public interface OrderService extends IService<Order> {
+public interface OrderService {
+
 
     /**
      * 创建订单
-     *
-     * @param ordersDTO 订单数据传递
-     * @return 三方支付表单
      */
-    Map<String, Object> placeAnOrder(OrdersDTO ordersDTO);
+    Long create(OrderDTO orderDTO);
+
+    /**
+     * 支付订单
+     */
+    String pay(Long tradeNo);
+
+    /**
+     * 接受订单
+     */
+    void accept(Long tradeNo);
+
+    /**
+     * 配送订单
+     */
+    void startDelivery(Long tradeNo);
+
+    /**
+     * 订单完成
+     */
+    void finished(long tradeNo);
+
+    void refund(RefundDTO refundDTO);
+
+    /**
+     * 订单取消
+     */
+    Result cancel(Long tradeNo, Role source, String cancelReason);
 
     /**
      * 获取订单详情
@@ -31,11 +58,6 @@ public interface OrderService extends IService<Order> {
      */
     Order getOrder(long tradeNo);
 
-//    /**
-//     * 用户支付
-//     */
-//    boolean userPay(long tradeNo, LocalDateTime paymentTime);
-
     /**
      * 统计状态
      *
@@ -43,54 +65,5 @@ public interface OrderService extends IService<Order> {
      */
     OrderStatusCount orderCount();
 
-    /**
-     * 取消订单
-     *
-     * @param tradeNo      订单编号
-     * @param cancelReason 取消原因
-     */
-    void cancelOrder(Long tradeNo, Long uid, String cancelReason);
-
-//    /**
-//     * 接受订单
-//     *
-//     * @param tradeNo 订单编号
-//     * @return 是否成功
-//     */
-//    boolean approveOrder(Long tradeNo);
-//
-//    /**
-//     * 拒绝订单
-//     *
-//     * @param tradeNo 订单编号
-//     * @return 是否成功
-//     */
-//    boolean deliveryOrder(Long tradeNo);
-//
-//    /**
-//     * 订单完成
-//     *
-//     * @param tradeNo 订单编号
-//     * @return 是否成功
-//     */
-//    boolean completeOrder(Long tradeNo);
-
-    /**
-     * 更新订单状态
-     *
-     * @param tradeNo  订单编号
-     * @param expected 预期状态
-     * @param actual   实际状态
-     * @return 是否修改成功
-     */
-    boolean updateOrderStatus(long tradeNo, OrderStatus expected, OrderStatus actual);
-
-    /**
-     * 订单退款
-     *
-     * @param tradeNo 订单编号
-     */
-    void refundOrder(long tradeNo, double amount);
-
-    PageData<Order> listOrder(PageQuery pageQuery, OrderStatus status, Long uid);
+    PageData<Order> listOrder(Long uid, PageQuery pageQuery, OrderStatus status, String tradeNO, String phone, LocalDate start, LocalDate end);
 }
