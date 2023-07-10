@@ -1,4 +1,4 @@
-package com.easterfg.takeaway.utils.enums;
+package com.easterfg.takeaway.enums;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -9,17 +9,24 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  */
 @JsonFormat(shape = JsonFormat.Shape.NUMBER)
 public enum OrderStatus {
-    WAIT_PAYMENT(0),
-    WAIT_ACCEPT(1),
-    WAIT_DELIVERY(2),
-    DELIVERING(3),
-    FINISHED(4),
-    CANCELLED(5);
+    WAIT_PAYMENT(0, "待支付"),
+    WAIT_ACCEPT(1, "待接单"),
+    WAIT_DELIVERY(2, "待配送"),
+    DELIVERING(3, "配送中"),
+    REFUNDING(4, "退款中"),
+    REFUNDED(5, "订单取消(已退款)"),
+    FINISHED(6, "订单完成"),
+    /**
+     * 待支付状态被取消,进入此状态
+     */
+    CANCELLED(7, "订单取消");
 
     private final int code;
+    private final String desc;
 
-    OrderStatus(int code) {
+    OrderStatus(int code, String desc) {
         this.code = code;
+        this.desc = desc;
     }
 
     public static OrderStatus valueOf(int code) {
@@ -31,5 +38,9 @@ public enum OrderStatus {
 
     public int getCode() {
         return code;
+    }
+
+    public String getDesc() {
+        return desc;
     }
 }

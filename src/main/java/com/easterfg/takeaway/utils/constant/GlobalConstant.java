@@ -17,10 +17,8 @@ public class GlobalConstant {
     public static final String ORDER_STATUS_EXCEPTION = "订单状态异常";
     public static final int WAIT_PAYMENT = 1;
     public static final int WAIT_APPROVAL = 2;
-    public static final int WAIT_DELIVERY = 3;
-    public static final int DISTRIBUTION = 4;
-    public static final int FINISH = 5;
     public static final int CANCEL = 6;
+
     private GlobalConstant() {
     }
 }
